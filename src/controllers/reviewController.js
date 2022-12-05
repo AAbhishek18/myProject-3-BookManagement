@@ -5,7 +5,11 @@ const mongoose = require("mongoose");
 const createReview = async function (req, res) {
   try {
     //reading bookid from path
-    const _id = req.params.bookId;
+    let _id = req.params.bookId;
+     let body=req.body;
+     console.log(body);
+    
+
 
     //id format validation
     if (_id) {
@@ -17,9 +21,9 @@ const createReview = async function (req, res) {
     }
 
     //fetch book with bookId
-    const book = await bookModel.findOne({
-      $and: [{ _id }, { isDeleted: false }],
-    });
+    let book = await bookModel.findOne({ $and: [{ _id }, { isDeleted: false }],});
+   // book=JSON.parse(book);
+    console.log(book);
 
     //no books found
     if (!book) {
@@ -27,34 +31,38 @@ const createReview = async function (req, res) {
     }
 
     //reading request body
-    const body = req.body;
-    const { reviewedAt, reviewedBy, rating } = body;
+   
+    
+    //const { reviewedAt, reviewedBy, rating } = body;
 
-    let arr = Object.keys(body);
+    // let arr = Object.keys(body);
 
-    //if empty request body
-    if (arr.length == 0) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Please provide input" });
-    }
+    // console.log(arr);
+
+    // //if empty request body
+    // if (arr.length == 0) {
+    //   return res
+    //     .status(400)
+    //     .send({ status: false, message: "Please provide input" });
+    // }
 
     //mandatory fields
 
-    if (!rating) {
+   //console.log(body.rating+" "+body.reviewedBy+" "+body.review);
+    if (!body.rating) {
       return res
         .status(400)
         .send({ status: false, message: "rating is required" });
     }
 
     //rating validation
-    const validRating = /^([1-5]|1[5])$/.test(rating);
-    if (!validRating) {
-      return res.status(400).send({
-        status: false,
-        message: "Invalid rating - rating should be a Number between 1 to 5",
-      });
-    }
+    // const validRating = /^([1-5]|1[5])$/.test(rating);
+    // if (!validRating) {
+    //   return res.status(400).send({
+    //     status: false,
+    //     message: "Invalid rating - rating should be a Number between 1 to 5",
+    //   });
+    // }
 
     //assign bookId from path
     body.bookId = _id;
@@ -102,7 +110,6 @@ const updateReview = async function (req, res) {
 
     //id format validation
     if (_id) {
-     
       if (mongoose.Types.ObjectId.isValid(_id) == false) {
         return res
           .status(400)

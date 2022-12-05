@@ -13,13 +13,13 @@ const authentication = async function (req, res, next) {
 
     //decode token
     try {
-      const decodedToken = jwt.verify(token, "project3-uranium", {
-        ignoreExpiration: true,
+      const decodedToken = jwt.verify(token, "abhishekkumar", {
+        //ignoreExpiration: true,
       });
-      console.log(decodedToken.exp * 1000);
+      //console.log(decodedToken.exp*1000);//*1000
       //console.log(Date.now());
 
-      if (Date.now() > decodedToken.exp * 1000) {
+      if (Date.now() > decodedToken.exp*1000) {//*1000
         return res
           .status(401)
           .send({ status: false, message: "session expired" });
@@ -43,22 +43,31 @@ const authentication = async function (req, res, next) {
 const authorization = async function (req, res, next) {
   try {
     const decodedToken = req.decodedToken;
+    
+     userId = decodedToken.userId;
+   
+     //bookId from params
+    let  bookIdFromParams = req.params.bookId;
 
-    let id = decodedToken.userId;
+   
 
-    const _id = req.params.bookId;
 
-    if (_id) {
+    if (bookIdFromParams) {
       //id format validation
-      if (_id) {
-        if (mongoose.Types.ObjectId.isValid(_id) == false) {
+      if (bookIdFromParams) {
+        if (mongoose.Types.ObjectId.isValid(bookIdFromParams) == false) {
           return res
             .status(400)
             .send({ status: false, message: "Invalid bookId" });
         }
       }
 
-      const book = await bookModel.findById({ _id });
+      const book = await bookModel.findById({ _id: bookIdFromParams });
+      
+      let bookIdFromDB=book._id.toString();
+       
+      
+
 
       //no book found
       if (!book) {
@@ -67,10 +76,10 @@ const authorization = async function (req, res, next) {
           .send({ status: false, message: "book not found" });
       }
 
-      if (book.userId != id) {
-        return res
-          .status(401)
-          .send({ status: false, message: "Not authorised" });
+      //check if user is authorized
+
+      if (bookIdFromParams!= bookIdFromDB) {
+        return res.status(401).send({ status: false, message: "Not authorised" });
       }
 
       console.log("authorization successful");

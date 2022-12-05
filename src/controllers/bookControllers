@@ -3,6 +3,8 @@ const bookModel = require("../models/bookModel");
 const mongoose = require("mongoose");
 const reviewModel = require("../models/reviewModel");
 
+
+//create book
 const createBook = async function (req, res) {
   try {
     //reading input from request body
@@ -109,25 +111,22 @@ const createBook = async function (req, res) {
     }
 
     //create Book authorization
-    const loggedUserId = req.decodedToken.userId;
-    if (loggedUserId != Body.userId) {
-      return res.status(401).send({
-        status: false,
-        message: "Not authorised - use your own UserId",
-      });
-    }
+    // const loggedUserId = req.decodedToken.userId;
+    // if (loggedUserId != Body.userId) {
+    //   return res.status(401).send({
+    //     status: false,
+    //     message: "Not authorised - use your own UserId",
+    //   });
+    // }
 
     //book created
+     
     let bookCreated = await bookModel.create(Body);
-    res
-      .status(201)
-      .send({ status: true, message: "success", data: bookCreated });
+    res.status(201).send({ status: true, message: "success", data: bookCreated });
   } catch (err) {
-    res.status(500).send({
-      status: false,
-      Error: "Server not responding",
-      message: err.message,
-    });
+    res
+      .status(500)
+      .send({ status: false, Error: "Server error", message: err.message });
   }
 };
 
@@ -151,7 +150,8 @@ const getBook = async function (req, res) {
           category: 1,
           releasedAt: 1,
           reviews: 1,
-        }).select({ __v: 0 })
+        })
+        .select({ __v: 0 })
         .collation({ locale: "en", strength: 2 })
         .sort({ title: 1 });
 
@@ -209,7 +209,8 @@ const getBook = async function (req, res) {
           category: 1,
           releasedAt: 1,
           reviews: 1,
-        }).select({ __v: 0 })
+        })
+        .select({ __v: 0 })
         .collation({ locale: "en", strength: 2 })
         .sort({ title: 1 });
 
@@ -239,10 +240,12 @@ const getBook = async function (req, res) {
   }
 };
 
+//
 const getBookDetails = async function (req, res) {
   try {
     //reading bookid from path
     const _id = req.params.bookId;
+    console.log(_id);
 
     //id format validation
     if (_id) {
@@ -254,13 +257,8 @@ const getBookDetails = async function (req, res) {
     }
 
     //fetch book with bookId
-    const book = await bookModel
-      .findOne({
-        $and: [{ _id }, { isDeleted: false }],
-      })
-      .select({ __v: 0 })
-      .lean(); //unfreeze document received from mongoDB
-
+    const book = await bookModel.findOne({$and: [{ _id }, { isDeleted: false }]}).select({ __v: 0 }).lean(); //unfreeze document received from mongoDB
+    console.log(book);
     //no books found
     if (!book) {
       return res.status(404).send({ status: false, message: "book not found" });
@@ -289,7 +287,7 @@ const getBookDetails = async function (req, res) {
 const updateBook = async function (req, res) {
   try {
     //reading bookid from path
-    const _id = req.params.bookId;
+    let _id = req.params.bookId;
 
     //id format validation
     if (_id) {

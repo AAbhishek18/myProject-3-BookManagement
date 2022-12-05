@@ -85,7 +85,9 @@ const createUser = async function (req, res) {
 
     //title enum validation
     if (!["Mr", "Mrs", "Miss"].includes(Body.title)) {
-      return res.status(400).send({status: false, message: "Title Must be of these values [Mr, Mrs, Miss] ",
+      return res.status(400).send({
+        status: false,
+        message: "Title Must be of these values [Mr, Mrs, Miss] ",
       });
     }
 
@@ -158,10 +160,10 @@ const loginUser = async function (req, res) {
     //empty request body
     let Body = req.body;
     let arr = Object.keys(Body);
-    console.log(arr)
-    console.log(Body)
-    console.log(typeof(arr))
-    console.log(typeof(Body))
+    // console.log(arr)
+    // console.log(Body)
+    // console.log(typeof(arr))
+    // console.log(typeof(Body))
 
     if (arr.length == 0) {
       return res
@@ -175,14 +177,12 @@ const loginUser = async function (req, res) {
 
     //if email or password is missing
     if (!Email) {
-      return res
-        .status(400)
-        .send({ status: false, Error: "Please enter an email address." });
-    } else if (!Password) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Please enter Password." });
-    } else {
+      return res.status(400).send({ status: false, Error: "Please enter an email address." });
+    }
+    else if (!Password) {
+      return res.status(400).send({ status: false, message: "Please enter Password." });
+    }
+    else {
       //fetch user with login credential
       let user = await userModel.findOne({ email: Email, password: Password });
       //no user found
@@ -196,13 +196,14 @@ const loginUser = async function (req, res) {
       let token = jwt.sign(
         {
           userId: user._id.toString(),
-          batch: "uranium",
-          organisation: "FunctionUp",
+          iat: Math.floor(Date.now() / 1000),
+          name: 'Abhishek'
+
         },
-        "project3-uranium",
+        "abhishekkumar",
         { expiresIn: "1h" } //expires in 1hr
       );
-      res.setHeader("x-api-key", token); //send token in response headers
+      res.setHeader("x-api-key", token,{new:true}); //send token in response headers
       res.status(200).send({ status: true, message: token }); //send token in response body
     }
   } catch (error) {

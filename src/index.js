@@ -6,14 +6,19 @@ const route = require("./routes/routes.js"); //imported route
 const mongoose = require("mongoose"); //ODM library for mongoDB
 const app = express(); //Assign express in app variable
 
+const multer= require("multer");//multer is a node.js middleware for handling multipart/form-data, which is primarily used for uploading files.
+const { AppConfig } = require('aws-sdk');//
+
+
 app.use(bodyParser.json()); //transforms the text-based JSON input into JS-accessible variables
 //extended: true precises that the req.body object will contain values of any type instead of just strings.
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use( multer().any())
 
 //a framework that helps to establish a connection b/w node and mongoDB
 mongoose
   .connect(
-    "mongodb+srv://AAbhishek2022:1ESrG6kzyaqzUE3p@cluster0.am17a.mongodb.net/group15Database",
+    "mongodb+srv://AAbhishek2022:1ESrG6kzyaqzUE3p@cluster0.am17a.mongodb.net/bookManagementDB",
     {
       useNewUrlParser: true,
     }
